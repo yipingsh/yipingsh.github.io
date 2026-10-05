@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sheng Yiping | Portfolio</title>
+    <meta name="description" content="Sheng Yiping — ICT undergraduate at SUSS focused on full-stack development and applied AI.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Scroll progress bar -->
+<div id="progress-bar"></div>
+
+<!-- Navigation -->
+<nav id="nav">
+    <div class="nav-inner">
+        <a href="#hero" class="nav-logo">SY</a>
+        <ul class="nav-links">
+            <li><a href="#hero" class="nav-link">Home</a></li>
+            <li><a href="#about" class="nav-link">About</a></li>
+            <li><a href="#projects" class="nav-link">Projects</a></li>
+            <li><a href="#experience" class="nav-link">Experience</a></li>
+            <li><a href="#cv-section" class="nav-link">CV</a></li>
+        </ul>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Mobile overlay -->
+<div id="mobile-overlay">
+    <a href="#hero">Home</a>
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#experience">Experience</a>
+    <a href="#cv-section">CV</a>
+</div>
+
+<main>
+
+    <!-- HERO -->
+    <section id="hero" class="section">
+        <canvas id="bg-canvas"></canvas>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+
+        <div class="hero-content">
+            <p class="hero-tag">Welcome to my portfolio</p>
+            <h1 class="hero-name" aria-label="Sheng Yiping">
+                <span class="word"><span>Sheng</span></span>
+                <span class="word"><span>Yiping</span></span>
+            </h1>
+            <p class="hero-subtitle">
+                ICT Undergraduate at SUSS<br>Full-Stack Development · Applied AI
+            </p>
+            <div class="hero-actions">
+                <a href="mailto:ypsheng001@suss.edu.sg" class="btn btn-outline">
+                    <i class="fa-solid fa-envelope"></i> Email
+                </a>
+                <a href="https://linkedin.com/in/sheng-yiping-7740961ba" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                    <i class="fa-brands fa-linkedin"></i> LinkedIn
+                </a>
+                <a href="https://github.com/yipingsh" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                    <i class="fa-brands fa-github"></i> GitHub
+                </a>
+                <a href="#cv-section" class="btn btn-filled">
+                    <i class="fa-solid fa-file-lines"></i> View CV
+                </a>
+            </div>
+        </div>
+
+        <div class="scroll-hint">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+        <div class="section-inner">
+            <p class="section-eyebrow reveal">About Me</p>
+            <h2 class="section-heading reveal">A bit about me</h2>
+            <span class="section-rule reveal"></span>
+
+            <div class="card about-card reveal">
+                <p class="about-text">
+                    I'm pursuing a BSc in Information and Communication Technology at the Singapore University of
+                    Social Sciences, after completing a Diploma in Information Technology at Singapore Polytechnic.
+                    I'm most interested in where software development meets AI, and I enjoy building things end to
+                    end, from the database to the interface.
+                </p>
+                <p class="about-text">
+                    During my diploma, I interned as a data analyst at SP's Data Science and Analytics Centre, where
+                    I built a data integration system and a set of dashboards in MicroStrategy. I then served two years
+                    of National Service as an anti-tank section commander, responsible for the training, welfare and
+                    readiness of my section.
+                </p>
+                <p class="about-text">
+                    I'm now looking for an internship in software development or applied AI, where I can contribute
+                    to real products and keep learning from experienced engineers. Outside of tech, I enjoy hiking and
+                    rock climbing.
+                </p>
+            </div>
+
+            <h3 class="sub-heading reveal">Education</h3>
+            <div class="edu-grid">
+                <div class="card edu-card reveal">
+                    <span class="badge">08/2025 – Present</span>
+                    <h3>BSc Information and Communication Technology</h3>
+                    <p class="org">Singapore University of Social Sciences · School of Science and Technology</p>
+                    <p class="grade">GPA 4.25 / 5.0</p>
+                </div>
+                <div class="card edu-card reveal">
+                    <span class="badge">04/2020 – 03/2023</span>
+                    <h3>Diploma in Information Technology</h3>
+                    <p class="org">Singapore Polytechnic</p>
+                </div>
+            </div>
+
+            <h3 class="sub-heading reveal">Technical Skills</h3>
+            <div class="card mini-card skills-card reveal">
+                <div class="skill-group">
+                    <h4>Languages</h4>
+                    <ul><li>TypeScript</li><li>JavaScript</li><li>Python</li><li>SQL</li></ul>
+                </div>
+                <div class="skill-group">
+                    <h4>Frontend</h4>
+                    <ul><li>React</li><li>Tailwind CSS</li><li>Vite</li></ul>
+                </div>
+                <div class="skill-group">
+                    <h4>Backend &amp; Cloud</h4>
+                    <ul><li>Supabase</li><li>AWS</li><li>Cloudflare Pages</li><li>Git</li></ul>
+                </div>
+                <div class="skill-group">
+                    <h4>AI &amp; Data</h4>
+                    <ul><li>Gemini API</li><li>OpenAI API</li><li>MicroStrategy</li></ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="section">
+        <div class="section-inner">
+            <p class="section-eyebrow reveal">Side Projects</p>
+            <h2 class="section-heading reveal">Projects</h2>
+            <span class="section-rule reveal"></span>
+
+            <div class="project-list">
+                <article class="card project featured reveal">
+                    <div class="project-head">
+                        <span class="badge">2026</span>
+                        <span class="badge badge-live"><i class="fa-solid fa-circle"></i> Live</span>
+                    </div>
+                    <h3 class="project-title">Inkling</h3>
+                    <p class="project-sub">Journaling app with AI-generated wallpapers</p>
+                    <ul class="project-points">
+                        <li>Generates a phone wallpaper reflecting the mood of each journal entry, with a calendar view of past wallpapers.</li>
+                        <li>Two-model AI pipeline (Google Gemini writes the prompt, OpenAI generates the image) running in a Supabase Edge Function, with images in private Supabase Storage.</li>
+                        <li>Deployed and maintained as a live production app.</li>
+                    </ul>
+                    <ul class="chips small">
+                        <li>React</li><li>TypeScript</li><li>Vite</li><li>Tailwind CSS</li><li>Supabase</li><li>Cloudflare Pages</li>
+                    </ul>
+                    <div class="project-links">
+                        <a href="https://inkling-7j0.pages.dev" target="_blank" rel="noopener noreferrer" class="link-pill">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Live site
+                        </a>
+                    </div>
+                </article>
+
+                <article class="card project reveal">
+                    <div class="project-head">
+                        <span class="badge">2021</span>
+                    </div>
+                    <h3 class="project-title">Competition Management App</h3>
+                    <p class="project-sub">Web application for competition entries and results</p>
+                    <ul class="project-points">
+                        <li>Built and hosted a web application for managing competition entries and results on AWS.</li>
+                    </ul>
+                    <ul class="chips small">
+                        <li>JavaScript</li><li>HTML</li><li>CSS</li><li>AWS</li>
+                    </ul>
+                </article>
+
+                <article class="card project reveal">
+                    <div class="project-head">
+                        <span class="badge">2021</span>
+                    </div>
+                    <h3 class="project-title">Reddit Clone</h3>
+                    <p class="project-sub">Community discussion platform</p>
+                    <ul class="project-points">
+                        <li>Functional clone with posts, comments and SQL-backed persistence, deployed on Heroku.</li>
+                    </ul>
+                    <ul class="chips small">
+                        <li>JavaScript</li><li>HTML</li><li>CSS</li><li>SQL</li><li>Heroku</li>
+                    </ul>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience" class="section">
+        <div class="section-inner">
+            <p class="section-eyebrow reveal">Career</p>
+            <h2 class="section-heading reveal">Experience</h2>
+            <span class="section-rule reveal"></span>
+
+            <ol class="timeline">
+                <li class="timeline-item reveal">
+                    <span class="timeline-date">07/2023 – 05/2025</span>
+                    <div class="card timeline-card">
+                        <h3>Sergeant, Infantryman</h3>
+                        <p class="org">Singapore Armed Forces · Full-time National Service</p>
+                        <ul>
+                            <li>Man-Portable Anti-Tank (MPAT) Section Commander, responsible for the training, welfare and operational readiness of the section.</li>
+                            <li>Awarded the Commander ATEC Commendation.</li>
+                            <li>Completed the Specialist Cadet Course.</li>
+                            <li>Controlled Equipment In-Charge, accountable for the issue, tracking and security of unit equipment.</li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="timeline-item reveal">
+                    <span class="timeline-date">09/2022 – 02/2023</span>
+                    <div class="card timeline-card">
+                        <h3>Data Analyst Intern</h3>
+                        <p class="org">SP Data Science and Analytics Centre</p>
+                        <ul>
+                            <li>Developed a data integration system compiling raw data from multiple sources.</li>
+                            <li>Produced data visualisations for analysis and built dashboards in MicroStrategy.</li>
+                            <li>Completed MicroStrategy courses and certifications.</li>
+                        </ul>
+                    </div>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- CV -->
+    <section id="cv-section" class="section">
+        <div class="section-inner cv-inner">
+            <p class="section-eyebrow reveal">Resume</p>
+            <h2 class="section-heading reveal">Curriculum Vitae</h2>
+            <span class="section-rule centered reveal"></span>
+            <p class="cv-text reveal">
+                My full CV is being polished and will be available here soon.
+                In the meantime, feel free to reach out by email or LinkedIn.
+            </p>
+            <!-- Placeholder: replace with <a href="cv.pdf" target="_blank" class="btn btn-filled"> once the CV is ready -->
+            <button type="button" class="btn btn-filled btn-disabled reveal" id="cv-button" aria-disabled="true">
+                <i class="fa-solid fa-hourglass-half"></i> CV Coming Soon
+            </button>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="mailto:ypsheng001@suss.edu.sg" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+        <a href="https://linkedin.com/in/sheng-yiping-7740961ba" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="https://github.com/yipingsh" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+    </div>
+    <p class="footer-copy">&copy; <span id="year"></span> Sheng Yiping. All Rights Reserved.</p>
+</footer>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

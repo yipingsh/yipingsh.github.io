@@ -1036,7 +1036,6 @@ const titleBase = new THREE.Vector3();
 const titleBaseQuat = new THREE.Quaternion();
 const titleLocal = new THREE.Vector3();
 const _attached = new THREE.Vector3();
-const FG_X = 0.22, FG_Y = 0.12;  // how far the name moves with the cursor (more than the room does)
 const _tCam = new THREE.PerspectiveCamera();
 function placeTitle() {
     if (!START) return;
@@ -1160,11 +1159,10 @@ function tick() {
     camera.lookAt(_look);
     camera.updateMatrixWorld();
 
-    // the name sits in the foreground: it shifts with the cursor in the same direction as the room
-    // but further, so it reads as closer. As you scroll in it hands over to its place in the room
-    // so the camera flies past it.
+    // the name: fixed to the camera on the landing view (drifting only slightly with the mouse),
+    // handing over to its place in the room as you scroll in so the camera flies past it
     const attach = 1 - smooth(0.0, 0.3, camP);
-    _attached.set(titleLocal.x + mouse.x * FG_X, titleLocal.y - mouse.y * FG_Y, titleLocal.z).applyMatrix4(camera.matrixWorld);
+    _attached.set(titleLocal.x + mouse.x * 0.06, titleLocal.y - mouse.y * 0.04, titleLocal.z).applyMatrix4(camera.matrixWorld);
     titleSign.mesh.position.lerpVectors(titleBase, _attached, attach);
     titleSign.mesh.quaternion.slerpQuaternions(titleBaseQuat, camera.quaternion, attach);
 
@@ -1218,6 +1216,26 @@ window.addEventListener('resize', () => {
     if (fontsReady) { titleSign.draw(); placeTitle(); }
 });
 
+// ── BROWSER TAB ICON ────────────────────────────────────────
+// "SY" in Fraunces on a dark rounded square, like the nav logo
+function drawFavicon() {
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const g = c.getContext('2d');
+    g.fillStyle = '#1e1f22';
+    g.beginPath();
+    g.roundRect(0, 0, 64, 64, 16);
+    g.fill();
+    g.fillStyle = '#f2f3f5';
+    g.font = '900 32px "Fraunces", serif';
+    g.textAlign = 'center';
+    g.textBaseline = 'alphabetic';
+    if ('letterSpacing' in g) g.letterSpacing = '-2px';
+    g.fillText('SY', 32, 44);
+    const link = document.querySelector('link[rel="icon"]');
+    if (link) { link.type = 'image/png'; link.href = c.toDataURL('image/png'); }
+}
+
 // ── START ───────────────────────────────────────────────────
 const loaderFill = document.getElementById('loader-fill');
 loaderFill.style.width = '60%';
@@ -1229,6 +1247,7 @@ Promise.all([
     document.fonts ? document.fonts.load('300 34px "Fraunces"') : null
 ]).catch(() => {}).then(() => {
     fontsReady = true;
+    drawFavicon();
     titleSign.draw();
     placeTitle();
     drawScreen(0);

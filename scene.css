@@ -1,12 +1,13 @@
+/* defaults match the Night theme, so nothing changes colour while the page starts up */
 :root {
-    --bg: #0a0d12;
-    --surface: rgba(18, 23, 31, 0.72);
-    --border: rgba(148, 163, 184, 0.16);
-    --accent: #4fd8c4;
-    --text: #dce3ea;
-    --text-mid: #9aa5b4;
-    --text-dim: #646f80;
-    --heading: #d3e4e6;
+    --bg: #1e1f22;
+    --surface: rgba(43, 45, 49, 0.82);
+    --border: rgba(255, 255, 255, 0.08);
+    --accent: #5865f2;
+    --text: #dbdee1;
+    --text-mid: #b5bac1;
+    --text-dim: #80848e;
+    --heading: #f2f3f5;
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -54,13 +55,17 @@ html, body {
     transition: opacity 0.4s ease;
 }
 .loader-help.show { opacity: 1; }
+/* the loader always looks the same: dark, with the SY monogram in the logo's font */
+#loader { background: #1e1f22; }
 .loader-name {
-    font-family: var(--title-font, 'Playfair Display', serif);
-    font-size: 2rem;
+    font-family: 'Fraunces', serif;
+    font-size: 2.2rem;
     font-weight: 900;
-    color: var(--heading);
-    letter-spacing: 2px;
+    color: #f2f3f5;
+    letter-spacing: -0.09em;
 }
+.loader-bar { background: rgba(255, 255, 255, 0.1); }
+#loader-fill { background: #5865f2; }
 .loader-bar {
     width: 120px;
     height: 2px;

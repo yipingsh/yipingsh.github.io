@@ -1159,10 +1159,10 @@ function tick() {
     camera.lookAt(_look);
     camera.updateMatrixWorld();
 
-    // the name: fixed to the camera on the landing view (drifting only slightly with the mouse),
+    // the name: fixed in the foreground on the landing view (the room moves with the cursor behind it),
     // handing over to its place in the room as you scroll in so the camera flies past it
     const attach = 1 - smooth(0.0, 0.3, camP);
-    _attached.set(titleLocal.x + mouse.x * 0.06, titleLocal.y - mouse.y * 0.04, titleLocal.z).applyMatrix4(camera.matrixWorld);
+    _attached.copy(titleLocal).applyMatrix4(camera.matrixWorld);
     titleSign.mesh.position.lerpVectors(titleBase, _attached, attach);
     titleSign.mesh.quaternion.slerpQuaternions(titleBaseQuat, camera.quaternion, attach);
 

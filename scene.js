@@ -1036,6 +1036,7 @@ const titleBase = new THREE.Vector3();
 const titleBaseQuat = new THREE.Quaternion();
 const titleLocal = new THREE.Vector3();
 const _attached = new THREE.Vector3();
+const FG_X = 0.22, FG_Y = 0.12;  // how far the name moves with the cursor (more than the room does)
 const _tCam = new THREE.PerspectiveCamera();
 function placeTitle() {
     if (!START) return;
@@ -1159,10 +1160,11 @@ function tick() {
     camera.lookAt(_look);
     camera.updateMatrixWorld();
 
-    // the name: fixed in the foreground on the landing view (the room moves with the cursor behind it),
-    // handing over to its place in the room as you scroll in so the camera flies past it
+    // the name sits in the foreground: it shifts with the cursor in the same direction as the room
+    // but further, so it reads as closer. As you scroll in it hands over to its place in the room
+    // so the camera flies past it.
     const attach = 1 - smooth(0.0, 0.3, camP);
-    _attached.copy(titleLocal).applyMatrix4(camera.matrixWorld);
+    _attached.set(titleLocal.x + mouse.x * FG_X, titleLocal.y - mouse.y * FG_Y, titleLocal.z).applyMatrix4(camera.matrixWorld);
     titleSign.mesh.position.lerpVectors(titleBase, _attached, attach);
     titleSign.mesh.quaternion.slerpQuaternions(titleBaseQuat, camera.quaternion, attach);
 

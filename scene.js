@@ -867,7 +867,7 @@ let navigating = false;
 
 // scrolling adds to the target, but never more than MAX_LEAD beyond the camera
 // moving between projects is a little quicker than the rest of the path
-const PROJECT_BOOST = 1.3;
+const PROJECT_BOOST = 1.4;
 const betweenProjects = () => progress >= PROJECT_FIRST && progress <= PROJECT_LAST;
 
 function scrollBy(delta) {

@@ -259,6 +259,7 @@ scene.add(blinds);
 
 // three pendant bulbs hanging from the top of the opening on thin cords
 const bulbs = [];
+const windowLights = [];
 const cordMat = m('wallDark', 0.6);
 [-0.42, 0, 0.42].forEach(dx => {
     const top = WIN.y + Math.sqrt(WIN.r * WIN.r - dx * dx);
@@ -275,10 +276,11 @@ const cordMat = m('wallDark', 0.6);
     bulb.position.set(WIN.x + dx, by, z);
     scene.add(bulb);
     bulbs.push(bulb);
+    const glow = new THREE.PointLight(0xffffff, 1.5, 4.5, 2);   // each bulb lights the room on its own
+    glow.position.set(WIN.x + dx, by, z + 0.15);
+    scene.add(glow);
+    windowLights.push(glow);
 });
-const windowLight = new THREE.PointLight(0xffffff, 4, 6, 2);
-windowLight.position.set(WIN.x, WIN.y, WIN.z + 0.6);
-scene.add(windowLight);
 
 // curved slatted partition wrapping around the back-left of the stage, just outside its edge.
 // Separate wooden slats with clear gaps, each standing on the floor.
@@ -816,7 +818,7 @@ function applyColors(A, B, k) {
     mixInto(fill.color, A.fill, B.fill, k);
     fill.intensity = lerp(A.fillInt, B.fillInt, k);
     mixInto(screenGlow.color, A.screen.accent, B.screen.accent, k);
-    mixInto(windowLight.color, A.bulb, B.bulb, k);
+    windowLights.forEach(l => mixInto(l.color, A.bulb, B.bulb, k));
     mixInto(lampLight.color, A.lampGlow, B.lampGlow, k);
 }
 
@@ -864,8 +866,13 @@ const NAV_SPEED = 3;         // nav links and arrow keys glide faster
 let navigating = false;
 
 // scrolling adds to the target, but never more than MAX_LEAD beyond the camera
+// moving between projects is a little quicker than the rest of the path
+const PROJECT_BOOST = 1.3;
+const betweenProjects = () => progress >= PROJECT_FIRST && progress <= PROJECT_LAST;
+
 function scrollBy(delta) {
     navigating = false;
+    if (betweenProjects()) delta *= PROJECT_BOOST;
     const lo = Math.max(0, progress - MAX_LEAD), hi = Math.min(LAST_STOP, progress + MAX_LEAD);
     targetProgress = Math.min(hi, Math.max(lo, targetProgress + delta));
 }
@@ -1078,7 +1085,7 @@ function tick() {
 
     {
         // move smoothly towards the target, never faster than the speed limit
-        const limit = (navigating ? NAV_SPEED : MAX_SPEED) * dt;
+        const limit = (navigating ? NAV_SPEED : MAX_SPEED * (betweenProjects() ? PROJECT_BOOST : 1)) * dt;
         const step = (targetProgress - progress) * (1 - Math.exp(-dt * 5));
         progress += Math.max(-limit, Math.min(limit, step));
         if (Math.abs(targetProgress - progress) < 0.0005) { progress = targetProgress; navigating = false; }

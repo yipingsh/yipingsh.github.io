@@ -867,7 +867,7 @@ let navigating = false;
 
 // scrolling adds to the target, but never more than MAX_LEAD beyond the camera
 // quicker legs: Inkling → Competition Manager → Reddit Clone → About (and back); everything else is unchanged
-const PROJECT_BOOST = 1.5;
+const PROJECT_BOOST = 1.6;   // nominal; works out about 50% faster in practice once the motion eases in and out
 const betweenProjects = () => progress >= PROJECT_FIRST && progress < ABOUT_STOP;
 
 function scrollBy(delta) {

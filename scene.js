@@ -11,7 +11,7 @@ const THEMES = {
     night: {
         label: 'Night', icon: 'fa-moon',
         bg: '#1e1f22', floor: '#2b2d31', wall: '#313338', wallDark: '#25262b', slat: '#c2a892', grille: '#9aa0aa',
-        platform: '#383a40', platformSide: '#2e3035', hole: '#0f1012', pedestal: '#41434a',
+        platform: '#383a40', platformSide: '#2e3035', hole: '#0f1012', pedestal: '#383a40',
         laptop: '#7d8089', laptopDark: '#3a3c42', key: '#111214', trackpad: '#71747d', bezel: '#09090b', hingeCol: '#1b1c1f',
         mug: '#3d424b', coffee: '#2e1c10',
         desk: '#4a4c54', deskDark: '#3a3c42', book1: '#5865f2', book2: '#23a55a', book3: '#f0b232',
@@ -29,8 +29,8 @@ const THEMES = {
     },
     day: {
         label: 'Day', icon: 'fa-sun',
-        bg: '#e9cfbb', floor: '#e5c6ae', wall: '#ecd7c6', wallDark: '#ddbea6', slat: '#ffffff', grille: '#c8875a',
-        platform: '#f2e3d6', platformSide: '#e4cab6', hole: '#5e4033', pedestal: '#f4e8de',
+        bg: '#e9cfbb', floor: '#d2a585', wall: '#ecd7c6', wallDark: '#ddbea6', slat: '#ffffff', grille: '#c8875a',
+        platform: '#e0b999', platformSide: '#d2a687', hole: '#5e4033', pedestal: '#e0b999',
         laptop: '#d8996a', laptopDark: '#b6774c', key: '#b9784d', trackpad: '#d0905f', bezel: '#140e0b', hingeCol: '#8d5c3d',
         mug: '#c8743f', coffee: '#2e1c10',
         desk: '#d9b597', deskDark: '#c39b7b', book1: '#c8743f', book2: '#f3e5d8', book3: '#9c5e43',
@@ -187,10 +187,10 @@ function woodMat(roughness) {
 }
 
 // ── LAYOUT CONSTANTS ────────────────────────────────────────
-const STAGE = { r: 3.7, h: 0.32 };
+const STAGE = { r: 4.55, h: 0.2 };
 const TOP = STAGE.h;                        // stage surface height
-const HOLE = { x: 0.5, z: 1.75, r: 0.68 }; // where the mug sinks
-const LAPTOP_AT = new THREE.Vector3(-1.45, 0, -0.15);
+const HOLE = { x: 0.65, z: 2.65, r: 0.68 }; // where the mug sinks
+const LAPTOP_AT = new THREE.Vector3(-2.05, 0, -0.45);
 const LAPTOP = { w: 2.1, d: 1.45, baseH: 0.055, lidH: 1.36, lidT: 0.026 };
 
 // ── ROOM ────────────────────────────────────────────────────
@@ -283,35 +283,29 @@ const cordMat = m('wallDark', 0.6);
     windowLights.push(glow);
 });
 
-// curved slatted partition wrapping around the back-left of the stage, just outside its edge.
-// Separate wooden slats with clear gaps, each standing on the floor.
+// curved slatted partition wrapping around the back-left of the stage, standing on the stage
+// a little in from its edge. Separate wooden slats with clear gaps.
 const partition = new THREE.Group();
-const arcR = STAGE.r + 0.45, arcFrom = Math.PI * 0.97, arcTo = Math.PI * 1.42, partN = 17;
+const arcR = 4.15, arcFrom = Math.PI * 0.97, arcTo = Math.PI * 1.42, partN = 14;
 for (let i = 0; i < partN; i++) {
     const a = arcFrom + (arcTo - arcFrom) * i / (partN - 1);
     const u = i / (partN - 1);
     const h = 2.7 + 1.1 * Math.sin(Math.PI * u);   // a gentle arch: 2.7 m at the ends, 3.8 m in the middle
-    const slat = shadowed(new THREE.Mesh(new RoundedBoxGeometry(0.17, h, 0.17, 2, 0.025), woodMat(0.75)));
-    slat.position.set(Math.cos(a) * arcR, h / 2, Math.sin(a) * arcR);
+    const slat = shadowed(new THREE.Mesh(new RoundedBoxGeometry(0.17, h, 0.22, 2, 0.025), woodMat(0.75)));   // 0.22 wide along the curve
+    slat.position.set(Math.cos(a) * arcR, TOP + h / 2, Math.sin(a) * arcR);
     slat.rotation.y = -a;
     partition.add(slat);
 }
 scene.add(partition);
 
 // ── STAGE (with an opening hole for the mug) ────────────────
-const RIM = 0.09;   // radius of the rounded top edge
-const rimProfile = [];
-for (let i = 0; i <= 12; i++) {
-    const t = (i / 12) * Math.PI / 2;   // quarter circle from the top surface down to the side
-    rimProfile.push(new THREE.Vector2(STAGE.r - RIM + Math.sin(t) * RIM, TOP - RIM + Math.cos(t) * RIM));
-}
-rimProfile.push(new THREE.Vector2(STAGE.r, 0.03), new THREE.Vector2(STAGE.r - 0.03, 0));
-rimProfile.reverse();   // bottom → top so the faces point outwards
-const stageRim = shadowed(new THREE.Mesh(new THREE.LatheGeometry(rimProfile, 200), m('platform', 0.9)), false);
-scene.add(stageRim);
+// a plain cylinder with crisp edges
+const stageSide = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(STAGE.r, STAGE.r, STAGE.h, 200, 1, true), m('platform', 0.9)), false);
+stageSide.position.y = STAGE.h / 2;
+scene.add(stageSide);
 
 const stageTopShape = new THREE.Shape();
-stageTopShape.absarc(0, 0, STAGE.r - RIM, 0, Math.PI * 2, false);
+stageTopShape.absarc(0, 0, STAGE.r, 0, Math.PI * 2, false);
 const stageHole = new THREE.Path();
 stageHole.absarc(HOLE.x, -HOLE.z, HOLE.r, 0, Math.PI * 2, true);
 stageTopShape.holes.push(stageHole);
@@ -319,14 +313,19 @@ const stageTop = shadowed(new THREE.Mesh(new THREE.ShapeGeometry(stageTopShape, 
 stageTop.rotation.x = -Math.PI / 2;
 stageTop.position.y = TOP;
 scene.add(stageTop);
-
-// accent line inlaid flush into the top surface, just inside the rim
-const ring = new THREE.Mesh(new THREE.RingGeometry(STAGE.r - RIM - 0.2, STAGE.r - RIM - 0.17, 256), b('accent', { transparent: true, opacity: 0.85 }));
+// a fine accent line close to the outer edge
+const ring = new THREE.Mesh(new THREE.RingGeometry(STAGE.r - 0.1, STAGE.r - 0.08, 256), b('accent', { transparent: true, opacity: 0.55 }));
 ring.rotation.x = -Math.PI / 2;
 ring.position.y = TOP + 0.0015;
 scene.add(ring);
+// the same top without the hole, shown while the mug is at rest so there's no outline at all
+const stageTopSolid = shadowed(new THREE.Mesh(new THREE.CircleGeometry(STAGE.r, 200), m('platform', 0.9)), false);
+stageTopSolid.rotation.x = -Math.PI / 2;
+stageTopSolid.position.y = TOP;
+scene.add(stageTopSolid);
 
-// the hole: a dark tube going down, and an iris "cap" that opens and closes
+
+// the hole: a dark shaft going straight down
 const holeMat = m('hole', 1);
 holeMat.side = THREE.DoubleSide;
 const tube = new THREE.Mesh(new THREE.CylinderGeometry(HOLE.r, HOLE.r, 2.4, 64, 1, true), holeMat);
@@ -337,35 +336,85 @@ tubeBottom.rotation.x = -Math.PI / 2;
 tubeBottom.position.set(HOLE.x, TOP - 2.4, HOLE.z);
 scene.add(tubeBottom);
 
-const cap = shadowed(new THREE.Mesh(new THREE.RingGeometry(0.0001, HOLE.r, 64), m('platform', 0.9)), false, true);
-cap.rotation.x = -Math.PI / 2;
-cap.position.set(HOLE.x, TOP, HOLE.z);
-scene.add(cap);
-const holeRim = new THREE.Mesh(new THREE.TorusGeometry(HOLE.r, 0.022, 12, 96), m('platformSide', 0.8));
-holeRim.rotation.x = Math.PI / 2;
-holeRim.position.set(HOLE.x, TOP, HOLE.z);
-scene.add(holeRim);
-let capOpen = -1;
-function setHole(open) {
-    if (Math.abs(open - capOpen) < 0.002) return;
-    capOpen = open;
-    cap.geometry.dispose();
-    cap.geometry = new THREE.RingGeometry(Math.max(HOLE.r * open, 0.0001), HOLE.r + 0.001, 64);
-    cap.visible = open < 0.999;
-    holeRim.scale.setScalar(Math.max(open, 0.001));
-    holeRim.visible = open > 0.01;
-}
+// the round section of stage under the mug: flush with the stage at rest, it sinks straight
+// down the shaft carrying the mug, and rises back up when scrolling back
+const PLUG_H = STAGE.h;
+const plug = shadowed(new THREE.Mesh(
+    new THREE.CylinderGeometry(HOLE.r, HOLE.r, PLUG_H, 64),
+    [m('platformSide', 0.9), m('platform', 0.9), m('platform', 0.9)]   // sides, top, bottom
+), false);
+plug.position.set(HOLE.x, TOP - PLUG_H / 2, HOLE.z);
+scene.add(plug);
 
 // ── LAPTOP (MacBook-style) ──────────────────────────────────
-// laptop stand: a plain cylinder with crisp edges, standing flush on the stage
-const PED = { r: 1.12, h: 0.46 };
-const pedestal = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(PED.r, PED.r, PED.h, 120), m('pedestal', 0.85)));
-pedestal.position.set(LAPTOP_AT.x, TOP + PED.h / 2, LAPTOP_AT.z);
+// laptop stand: a plain cylinder with crisp edges, standing flush on the stage, with hand-trowelled
+// plaster sides: soft, low dents and smears with barely any colour change. Drawn in near white so each
+// theme's pedestal colour tints it; the same height field drives the bump map.
+const plasterTex = (() => {
+    const W = 1024, H = 256;
+    // value noise that repeats every `period` cells across x, so the texture wraps round the cylinder
+    const hash = (x, y) => { const h = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return h - Math.floor(h); };
+    const noise = (x, y, period) => {
+        const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+        const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+        const x0 = ((xi % period) + period) % period, x1 = (x0 + 1) % period;
+        const a = hash(x0, yi), b = hash(x1, yi), c2 = hash(x0, yi + 1), d = hash(x1, yi + 1);
+        return a + (b - a) * u + (c2 - a) * v + (a - b - c2 + d) * u * v;
+    };
+    const at = (x, y, cell) => noise(x / cell, y / cell, W / cell);
+    const height = new Float32Array(W * H);
+    for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+            // smear the pattern sideways a little, like a trowel pass
+            const wx = x + (at(x, y, 128) - 0.5) * 90, wy = y + (at(x + 300, y, 128) - 0.5) * 40;
+            const xx = ((wx % W) + W) % W;
+            const soft = at(xx, wy, 128) * 0.45 + at(xx, wy, 64) * 0.3 + at(xx, wy, 32) * 0.17 + at(xx, wy, 16) * 0.08;
+            const ridge = 1 - Math.abs(at(xx, wy, 128) * 2 - 1);           // a few faint trowel edges
+            height[y * W + x] = soft * 0.85 + Math.pow(ridge, 4) * 0.15;
+        }
+    }
+    const make = (toByte, srgb) => {
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const g = c.getContext('2d');
+        const img = g.createImageData(W, H);
+        for (let i = 0; i < W * H; i++) {
+            const v = Math.max(0, Math.min(255, toByte(height[i])));
+            img.data[i * 4] = img.data[i * 4 + 1] = img.data[i * 4 + 2] = v;
+            img.data[i * 4 + 3] = 255;
+        }
+        g.putImageData(img, 0, 0);
+        const t = new THREE.CanvasTexture(c);
+        if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+        t.wrapS = THREE.RepeatWrapping;
+        t.repeat.set(4, 1);
+        t.anisotropy = 8;
+        return t;
+    };
+    return {
+        color: make(h => (0.955 + (h - 0.5) * 0.04) * 255, true),
+        bump: make(h => h * 255, false)
+    };
+})();
+const plasterMat = m('pedestal', 0.95);
+plasterMat.map = plasterTex.color;
+plasterMat.bumpMap = plasterTex.bump;
+plasterMat.bumpScale = 1.8;
+
+const PED = { r: 1.32, h: 0.5 };
+const pedestal = shadowed(new THREE.Mesh(
+    new THREE.CylinderGeometry(PED.r, PED.r, PED.h, 120),
+    [plasterMat, m('pedestal', 0.85), m('pedestal', 0.85)]   // plaster sides, plain top and bottom
+));
+// the stand sits a little behind the laptop so the laptop floats nearer its front edge
+pedestal.position.set(LAPTOP_AT.x - 0.1, TOP + PED.h / 2, LAPTOP_AT.z - 0.35);
 scene.add(pedestal);
 
-const LAPTOP_Y = TOP + PED.h + 0.68;
+const LAPTOP_SCALE = 0.9;
+const LAPTOP_Y = TOP + PED.h + 0.62;
 const laptop = new THREE.Group();
 laptop.position.set(LAPTOP_AT.x, LAPTOP_Y, LAPTOP_AT.z);
+laptop.scale.setScalar(LAPTOP_SCALE);
 const LAPTOP_YAW = 0.38;
 laptop.rotation.y = LAPTOP_YAW;
 scene.add(laptop);
@@ -1026,12 +1075,13 @@ canvas.addEventListener('click', () => {
 let START, END, STOPS;
 function computeViews() {
     const back = THREE.MathUtils.clamp(1.65 / camera.aspect, 1, 3.2);
-    const dist = 8.2 * back * (camera.aspect > 1 ? 1.14 : 1);   // a little further back on wide screens to fit the name
+    const dist = 8.2 * back * (camera.aspect > 1 ? 1.36 : 1);    // further back on wide screens to fit the name and the front of the stage
     scene.fog.near = dist + 4;
     scene.fog.far = dist + 22;
     START = {
         pos: new THREE.Vector3(0, 2.7 + (back - 1) * 0.6, dist),
-        target: new THREE.Vector3(0, 1.45, -0.6)
+        // aimed a little lower on landscape screens so the whole front of the stage is in view
+        target: camera.aspect > 1 ? new THREE.Vector3(0, 1.1, -0.2) : new THREE.Vector3(0, 1.45, -0.6)
     };
 
     laptop.position.set(LAPTOP_AT.x, LAPTOP_Y, LAPTOP_AT.z);   // rest pose for framing
@@ -1044,16 +1094,17 @@ function computeViews() {
     const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(q);
     const right = new THREE.Vector3(1, 0, 0).applyQuaternion(q);
     const up = new THREE.Vector3(0, 1, 0).applyQuaternion(q);
-    const mid = center.clone().addScaledVector(up, -LAPTOP.lidH * 0.28);   // middle of the whole laptop
+    const LW = LAPTOP.w * LAPTOP_SCALE, LH = LAPTOP.lidH * LAPTOP_SCALE;   // laptop's size in the scene
+    const mid = center.clone().addScaledVector(up, -LH * 0.28);   // middle of the whole laptop
 
     const tanH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     let d, look;
     if (camera.aspect >= 1) {
-        d = Math.max(LAPTOP.w / (0.62 * tanH * camera.aspect), LAPTOP.lidH * 1.9 / (2 * tanH));
+        d = Math.max(LW / (0.62 * tanH * camera.aspect), LH * 1.9 / (2 * tanH));
         const visW = 2 * d * tanH * camera.aspect;
         look = mid.clone().addScaledVector(right, visW * 0.21).addScaledVector(up, -0.15);
     } else {
-        d = LAPTOP.w / (1.25 * tanH * camera.aspect);
+        d = LW / (1.25 * tanH * camera.aspect);
         const visH = 2 * d * tanH;
         look = mid.clone().addScaledVector(up, -visH * 0.13);
     }
@@ -1071,10 +1122,10 @@ function computeViews() {
     STOPS = [
         START,
         ...projectViews,
-        viewAt(new THREE.Vector3(WIN.x, WIN.y - 0.1, WIN.z), new THREE.Vector3(-0.35, 0.05, 1), 4.6, -1),   // about: window
+        viewAt(new THREE.Vector3(WIN.x, WIN.y - 0.1, WIN.z), new THREE.Vector3(-0.12, 0.04, 1), 4.6, -1),   // about: window, nearly face-on
         viewAt(onDeskAt(-0.75, onDesk + 0.12, -0.1), new THREE.Vector3(0.25, 0.55, 1), 2.4, 1),             // education: books
         viewAt(onDeskAt(0.4, onDesk + 0.45, -0.25), new THREE.Vector3(-0.3, 0.35, 1), 2.7, -1),             // skills: lamp
-        viewAt(onDeskAt(DESK.w / 2 - 0.4, 0.75, DESK.d / 2), new THREE.Vector3(0.45, 0.25, 1), 3.1, 1)      // experience: drawers
+        viewAt(onDeskAt(DESK.w / 2 - 0.55, 0.8, DESK.d / 2), new THREE.Vector3(-0.3, 0.32, 1), 4.1, 1)     // experience: the drawers with the whole desk in view
     ];
 }
 
@@ -1161,7 +1212,7 @@ function placeTitle() {
     _tCam.updateMatrixWorld();
 
     const topPx = THREE.MathUtils.clamp(0.08 * h, 60, 88);
-    const D = START.pos.distanceTo(START.target) * 0.45;            // how far in front of the camera
+    const D = START.pos.distanceTo(START.target) * 0.65;            // how far in front of the camera (further = longer fly-past)
     const ray = new THREE.Vector3(0, -((topPx - extra + cssH / 2) / h) * 2 + 1, 0.5).unproject(_tCam).sub(_tCam.position).normalize();
     const fwd = new THREE.Vector3();
     _tCam.getWorldDirection(fwd);
@@ -1178,6 +1229,10 @@ function placeTitle() {
 let lastScreenDraw = -1;
 const tilt = new THREE.Vector2();   // eased cursor position the laptop leans towards
 const _pos = new THREE.Vector3();
+const camMouse = new THREE.Vector2();   // the cursor as the camera follows it: trails behind for a slow, dreamy drift
+// opening: as the loading screen slides away, the camera pulls back out from close in
+const INTRO_DELAY = 0, INTRO_MS = 2000, INTRO_ZOOM = 0.4;   // starts 40% of the way towards what it's looking at
+let introStart = null;
 const _look = new THREE.Vector3();
 
 function tick() {
@@ -1216,11 +1271,14 @@ function tick() {
         laptop.rotation.z = Math.sin(t * 0.8) * 0.012 * amp - tilt.x * 0.08;  // slight bank
     }
 
-    // mug: hole opens, mug sinks, hole closes again
-    const open = smooth(0.0, 0.14, progress);
-    const sink = smooth(0.08, 0.34, progress);
-    setHole(open);
-    mug.position.y = TOP - sink * 0.95 * MUG_SCALE;
+    // mug: the round section of stage under it sinks straight down the shaft, carrying it
+    const sink = smooth(0.02, 0.34, progress);
+    const drop = sink * 0.95 * MUG_SCALE;
+    mug.position.y = TOP - drop;
+    plug.position.y = TOP - PLUG_H / 2 - drop;
+    const atRest = drop < 0.0005;
+    stageTopSolid.visible = atRest;
+    stageTop.visible = plug.visible = tube.visible = tubeBottom.visible = !atRest;
     mug.visible = sink < 0.999;
 
     steam.forEach(s => {
@@ -1259,18 +1317,33 @@ function tick() {
         _pos.lerpVectors(STOPS[seg].pos, STOPS[seg + 1].pos, k);
         _look.lerpVectors(STOPS[seg].target, STOPS[seg + 1].target, k);
     }
+    camMouse.lerp(mouse, 1 - Math.exp(-dt * 1.5));
     const par = 1 - camP * 0.7;
-    const px = mouse.x * 0.45 * par, py = -mouse.y * 0.25 * par;
+    const px = camMouse.x * 0.9 * par, py = -camMouse.y * 0.5 * par;
+    // the cursor slides the view sideways and up/down: the camera and the point it looks at move
+    // together, so the scene pans without turning
     _pos.x += px;
     _pos.y += py;
+    _look.x += px;
+    _look.y += py;
+    if (!reducedMotion) {
+        const k = introStart === null ? 0 : clamp01((performance.now() - introStart - INTRO_DELAY) / INTRO_MS);
+        const out = 1 - Math.pow(1 - k, 3);                 // eases out as it settles into place
+        if (out < 1) _pos.lerp(_look, (1 - out) * INTRO_ZOOM);
+    }
     camera.position.copy(_pos);
     camera.lookAt(_look);
     camera.updateMatrixWorld();
 
-    // the name: fixed to the camera on the landing view (drifting only slightly with the mouse),
-    // handing over to its place in the room as you scroll in so the camera flies past it
+    // the name: on the landing view it holds its place relative to the room, so it slides with the
+    // scene as the camera pans, then hands over to its place in the room as you scroll in so the
+    // camera flies past it
     const attach = 1 - smooth(0.0, 0.3, camP);
-    _attached.set(titleLocal.x + mouse.x * 0.06, titleLocal.y - mouse.y * 0.04, titleLocal.z).applyMatrix4(camera.matrixWorld);
+    _attached.copy(titleLocal).applyMatrix4(camera.matrixWorld);
+    // nearer than the room: this much would keep it level with the room, and a little extra makes it read as slightly closer
+    const nameDepth = -titleLocal.z / START.pos.distanceTo(START.target) * 1.15;
+    _attached.x -= px * nameDepth;
+    _attached.y -= py * nameDepth;
     titleSign.mesh.position.lerpVectors(titleBase, _attached, attach);
     titleSign.mesh.quaternion.slerpQuaternions(titleBaseQuat, camera.quaternion, attach);
 
@@ -1370,5 +1443,8 @@ Promise.all([
     drawScreen(0);
     loaderFill.style.width = '100%';
     requestAnimationFrame(tick);
-    setTimeout(() => document.getElementById('loader').classList.add('done'), 350);
+    setTimeout(() => {
+        document.getElementById('loader').classList.add('done');
+        introStart = performance.now();
+    }, 350);
 });

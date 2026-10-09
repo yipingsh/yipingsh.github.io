@@ -57,7 +57,7 @@ let T = THEMES[themeKey];
 
 // ── PROJECTS (shown on the laptop + side panel) ─────────────
 const PROJECTS = [
-    { name: 'Finance Tracker', tags: 'React · Claude API · Supabase', year: '2026',
+    { name: 'Personal Finance Tracker', tags: 'React · Claude API · Supabase', year: '2026',
       desc: 'A finance tracker where a team of Claude agents reads your bank statements, checks the numbers add up and sums up your month.',
       links: { live: 'https://finance-tracker-1k3.pages.dev', code: 'https://github.com/yipingsh/finance-tracker' } },
     { name: 'Coming soon', tags: 'In progress',
@@ -647,7 +647,12 @@ function drawScreen(t = 0) {
 
     g.letterSpacing = '0px';
     g.fillStyle = S.text;
-    g.font = `${T.ui['--title-weight']} 120px ${T.ui['--title-font']}`;
+    let nameSize = 120;
+    g.font = `${T.ui['--title-weight']} ${nameSize}px ${T.ui['--title-font']}`;
+    while (g.measureText(p.name).width > W - padX * 2 && nameSize > 60) {   // long names shrink to fit
+        nameSize -= 4;
+        g.font = `${T.ui['--title-weight']} ${nameSize}px ${T.ui['--title-font']}`;
+    }
     g.fillText(p.name, padX, top + 140);
 
     g.fillStyle = S.mid;

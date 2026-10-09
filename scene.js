@@ -85,7 +85,9 @@ const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 scene.environmentIntensity = 0.3;
 
-const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.05, 120);
+// near plane kept well away from the camera: phone GPUs have little depth precision, and a tiny near
+// value made the laptop's thin layers (screen, glass, keys) flicker and break up into artifacts
+const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.4, 120);
 const clock = new THREE.Clock();
 
 // the name, as a sign floating in front of the stage (see title.js)
@@ -549,7 +551,7 @@ const sctx = screenCanvas.getContext('2d');
 const screenTex = new THREE.CanvasTexture(screenCanvas);
 screenTex.colorSpace = THREE.SRGBColorSpace;
 screenTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-const screen = new THREE.Mesh(new THREE.ShapeGeometry(roundedRect(SCREEN.w, SCREEN.h, 0.025), 8), new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false }));
+const screen = new THREE.Mesh(new THREE.ShapeGeometry(roundedRect(SCREEN.w, SCREEN.h, 0.025), 8), new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
 // map the shape's UVs to 0..1 so the canvas fills the screen
 {
     const uv = screen.geometry.attributes.uv, p = screen.geometry.attributes.position;

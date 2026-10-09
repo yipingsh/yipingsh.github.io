@@ -60,6 +60,8 @@ html, body {
     transition: opacity 0.4s ease;
 }
 .loader-help.show { opacity: 1; }
+/* iOS can still restyle detected dates and numbers as links: keep them looking like the text around them */
+a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font: inherit !important; }
 /* the loader always looks the same: dark, with the SY monogram in the logo's font */
 #loader { background: #1e1f22; }
 .loader-name {

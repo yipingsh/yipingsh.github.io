@@ -20,7 +20,7 @@ const THEMES = {
         accent: '#5865f2', particles: '#aab4ff',
         hemiSky: '#c9cdfb', hemiGround: '#1e1f22', hemiInt: 0.9,
         keyInt: 1.9, rim: '#5865f2', rimInt: 28, fill: '#8ea1e1', fillInt: 6, exposure: 1.0,
-        screen: { bg: ['#1e1f22', '#2b2d31'], accent: '#5865f2', text: '#f2f3f5', mid: '#b5bac1' },
+        screen: { bg: ['#1e1f22', '#2b2d31'], accent: '#5865f2', onAccent: '#ffffff', text: '#f2f3f5', mid: '#b5bac1' },
         ui: {
             '--bg': '#1e1f22', '--surface': 'rgba(43, 45, 49, 0.82)', '--border': 'rgba(255, 255, 255, 0.08)',
             '--accent': '#5865f2', '--text': '#dbdee1', '--text-mid': '#b5bac1', '--text-dim': '#80848e',
@@ -39,7 +39,7 @@ const THEMES = {
         accent: '#c8743f', particles: '#fff4e6',
         hemiSky: '#fff6ee', hemiGround: '#d8b39a', hemiInt: 1.15,
         keyInt: 1.6, rim: '#ffb37a', rimInt: 10, fill: '#ffe1c8', fillInt: 4, exposure: 0.9,
-        screen: { bg: ['#3a2a22', '#5b3e2f'], accent: '#f0a36b', text: '#fbefe4', mid: '#e2c9b6' },
+        screen: { bg: ['#3a2a22', '#5b3e2f'], accent: '#f0a36b', onAccent: '#3a2a22', text: '#fbefe4', mid: '#e2c9b6' },
         ui: {
             '--bg': '#e9cfbb', '--surface': 'rgba(255, 248, 242, 0.72)', '--border': 'rgba(120, 80, 60, 0.14)',
             '--accent': '#c8743f', '--text': '#4a3a33', '--text-mid': '#7a6458', '--text-dim': '#a08b7e',
@@ -57,12 +57,13 @@ let T = THEMES[themeKey];
 
 // ── PROJECTS (shown on the laptop + side panel) ─────────────
 const PROJECTS = [
-    { name: 'Inkling', tags: 'React · Supabase · AI', year: '2026',
-      desc: 'A journaling app that generates a phone wallpaper reflecting the mood of each entry.' },
-    { name: 'Competition Manager', tags: 'JavaScript · AWS', year: '2021',
-      desc: 'A web app for managing competition entries and results, hosted on AWS.' },
-    { name: 'Reddit Clone', tags: 'JavaScript · SQL · Heroku', year: '2021',
-      desc: 'A functional clone with posts, comments and SQL-backed persistence.' }
+    { name: 'Finance Tracker', tags: 'React · Claude API · Supabase', year: '2026',
+      desc: 'A finance tracker where a team of Claude agents reads your bank statements, checks the numbers add up and sums up your month.',
+      links: { live: 'https://finance-tracker-1k3.pages.dev', code: 'https://github.com/yipingsh/finance-tracker' } },
+    { name: 'Coming soon', tags: 'In progress',
+      desc: 'A new project is on the way.' },
+    { name: 'Coming soon', tags: 'In progress',
+      desc: 'A new project is on the way.' }
 ];
 let activeProject = 0;
 
@@ -531,6 +532,73 @@ function wrapText(g, text, x, y, maxW, lineH) {
         }
     }
     g.fillText(line, x, y);
+    return y;
+}
+
+// project links drawn on the screen itself. Their rectangles (in canvas pixels) are kept
+// so a click on the screen can be matched to a button.
+let screenButtons = [];
+let screenHover = null;
+
+function drawLinkIcon(g, id, x, y, s) {
+    g.beginPath();
+    if (id === 'live') {          // arrow pointing up and out
+        g.moveTo(x, y + s); g.lineTo(x + s, y);
+        g.moveTo(x + s * 0.3, y); g.lineTo(x + s, y); g.lineTo(x + s, y + s * 0.7);
+    } else {                      // </>
+        const w = s * 1.4;
+        g.moveTo(x + w * 0.24, y + s * 0.16); g.lineTo(x, y + s * 0.5); g.lineTo(x + w * 0.24, y + s * 0.84);
+        g.moveTo(x + w * 0.76, y + s * 0.16); g.lineTo(x + w, y + s * 0.5); g.lineTo(x + w * 0.76, y + s * 0.84);
+        g.moveTo(x + w * 0.57, y); g.lineTo(x + w * 0.43, y + s);
+    }
+    g.stroke();
+}
+
+// a pill button in the screen's colours: filled with the accent, or glass with a thin outline
+function drawScreenButton(g, S, b) {
+    const hover = screenHover === b.id;
+    g.save();
+    g.beginPath();
+    g.roundRect(b.x, b.y, b.w, b.h, b.h / 2);
+    if (b.primary) {
+        if (hover) { g.shadowColor = S.accent; g.shadowBlur = 48; }
+        g.fillStyle = S.accent;
+        g.fill();
+        g.shadowBlur = 0;
+        if (hover) { g.fillStyle = 'rgba(255, 255, 255, 0.14)'; g.fill(); }
+    } else {
+        g.fillStyle = hover ? 'rgba(255, 255, 255, 0.14)' : 'rgba(255, 255, 255, 0.06)';
+        g.fill();
+        g.lineWidth = 2.5;
+        g.strokeStyle = hover ? S.accent : 'rgba(255, 255, 255, 0.24)';
+        g.stroke();
+    }
+    const col = b.primary ? S.onAccent : S.text;
+    g.fillStyle = col;
+    g.strokeStyle = col;
+    g.lineWidth = 4;
+    g.lineCap = 'round';
+    g.lineJoin = 'round';
+    g.font = '600 34px Inter, sans-serif';
+    g.textAlign = 'left';
+    g.textBaseline = 'middle';
+    g.fillText(b.label, b.x + b.pad, b.y + b.h / 2 + 1);
+    drawLinkIcon(g, b.id, b.x + b.w - b.pad - b.iconW, b.y + (b.h - b.icon) / 2, b.icon);
+    g.restore();
+}
+
+function layoutScreenButtons(g, links, x, y) {
+    const defs = [];
+    if (links.live) defs.push({ id: 'live', label: 'Visit site', url: links.live, primary: true });
+    if (links.code) defs.push({ id: 'code', label: 'View code', url: links.code, primary: false });
+    g.font = '600 34px Inter, sans-serif';
+    return defs.map(d => {
+        const b = { ...d, x, y, h: 92, pad: 44, icon: 24 };
+        b.iconW = d.id === 'code' ? b.icon * 1.4 : b.icon;
+        b.w = b.pad + g.measureText(d.label).width + 22 + b.iconW + b.pad;
+        x += b.w + 24;
+        return b;
+    });
 }
 
 function drawScreen(t = 0) {
@@ -570,20 +638,24 @@ function drawScreen(t = 0) {
 
     // project card
     const padX = 120;
+    const top = H * (p.links ? 0.33 : 0.36);
     g.textAlign = 'left';
     g.fillStyle = S.accent;
     g.font = '700 30px Inter, sans-serif';
     g.letterSpacing = '8px';
-    g.fillText(`${p.year}  ·  ${p.tags.toUpperCase()}`, padX, H * 0.36);
+    g.fillText(p.year ? `${p.year}  ·  ${p.tags.toUpperCase()}` : p.tags.toUpperCase(), padX, top);
 
     g.letterSpacing = '0px';
     g.fillStyle = S.text;
     g.font = `${T.ui['--title-weight']} 120px ${T.ui['--title-font']}`;
-    g.fillText(p.name, padX, H * 0.36 + 140);
+    g.fillText(p.name, padX, top + 140);
 
     g.fillStyle = S.mid;
     g.font = '400 40px Inter, sans-serif';
-    wrapText(g, p.desc, padX, H * 0.36 + 230, W - padX * 2, 58);
+    const descEnd = wrapText(g, p.desc, padX, top + 230, W - padX * 2, 58);
+
+    screenButtons = p.links ? layoutScreenButtons(g, p.links, padX, descEnd + 72) : [];
+    screenButtons.forEach(b => drawScreenButton(g, S, b));
 
     screenTex.needsUpdate = true;
 }
@@ -842,8 +914,8 @@ let fade = null;   // { from, start } while a day/night switch is animating
 
 // ── SCROLL → CAMERA ─────────────────────────────────────────
 // The scroll path. Each section sits at a whole number along it:
-// 0 room, 1-3 one stop per project (laptop), 4 about me (window), 5 education (books),
-// 6 skills (lamp), 7 experience (drawers)
+// 0 room, then one stop per project (laptop), then about me (window), education (books),
+// skills (lamp) and experience (drawers)
 const PROJECT_FIRST = 1;
 const PROJECT_LAST = PROJECT_FIRST + PROJECTS.length - 1;
 const ABOUT_STOP = PROJECT_LAST + 1;
@@ -917,8 +989,32 @@ document.querySelectorAll('[data-go]').forEach(a => a.addEventListener('click', 
 }));
 
 const mouse = new THREE.Vector2();
+const pointerNDC = new THREE.Vector2(2, 2);   // off screen until the pointer moves
+let pointerOnScene = false;
+function trackPointer(e) {
+    pointerNDC.set(e.clientX / window.innerWidth * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+    pointerOnScene = e.target === canvas;      // not over the nav or a panel
+}
 window.addEventListener('pointermove', e => {
     mouse.set(e.clientX / window.innerWidth - 0.5, e.clientY / window.innerHeight - 0.5);
+    trackPointer(e);
+});
+window.addEventListener('pointerdown', trackPointer);
+
+// which of the laptop screen's buttons is under the pointer, if any
+const screenRay = new THREE.Raycaster();
+function screenButtonAt() {
+    if (!pointerOnScene || !screenButtons.length) return null;
+    if (progress < PROJECT_FIRST - 0.35 || progress > PROJECT_LAST + 0.35) return null;
+    screenRay.setFromCamera(pointerNDC, camera);
+    const hit = screenRay.intersectObject(screen)[0];
+    if (!hit) return null;
+    const x = hit.uv.x * screenCanvas.width, y = (1 - hit.uv.y) * screenCanvas.height;
+    return screenButtons.find(b => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) || null;
+}
+canvas.addEventListener('click', () => {
+    const b = screenButtonAt();
+    if (b) window.open(b.url, '_blank', 'noopener');
 });
 
 // opening shot (pulls back on narrow screens) and closing shot (laptop on the left)
@@ -1201,6 +1297,15 @@ function tick() {
             const from = Number(a.dataset.go), to = Number(a.dataset.goEnd || a.dataset.go);
             a.classList.toggle('active', nearest >= from && nearest <= to);
         });
+    }
+
+    // screen buttons: highlight the one under the pointer
+    const hovered = screenButtonAt();
+    const hoverId = hovered ? hovered.id : null;
+    if (hoverId !== screenHover) {
+        screenHover = hoverId;
+        canvas.style.cursor = hoverId ? 'pointer' : '';
+        drawScreen(t);
     }
 
     // only re-upload the screen texture when the clock's minute changes

@@ -250,6 +250,8 @@ html, body {
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
 .panel.show { opacity: 1; pointer-events: auto; transform: translateY(-50%); }
+/* the projects panel is wider, so each project name fits on one line and it scales up on big screens */
+#panel { width: min(44vw, 680px); }
 .panel-eyebrow {
     font-size: 0.72rem;
     font-weight: 700;
@@ -277,7 +279,7 @@ html, body {
     display: block;
     font-family: var(--title-font, 'Playfair Display', serif);
     font-weight: var(--title-weight, 900);
-    font-size: clamp(1.3rem, 2.4vw, 1.9rem);
+    font-size: clamp(1.3rem, 2.2vw, 3rem);
     line-height: 1.15;
 }
 .project-list .p-tags {
@@ -435,7 +437,18 @@ html, body {
     }
     .panel.show { transform: translateY(0); }
     .panel.left { left: 1rem; right: 1rem; }
-    .info-panel { width: auto; max-height: 50vh; }
+    #panel, .info-panel { width: auto; }
+    .info-panel { max-height: 50vh; }
+}
+
+/* big screens: the projects panel keeps growing, with its text and spacing growing to match */
+@media (min-width: 1500px) {
+    #panel { width: min(44vw, 920px); padding: clamp(2.2rem, 1.6vw, 3rem); }
+    #panel .panel-eyebrow { font-size: clamp(0.72rem, 0.6vw, 0.95rem); margin-bottom: clamp(1rem, 0.8vw, 1.4rem); }
+    #panel .project-list { gap: clamp(0.3rem, 0.4vw, 0.6rem); }
+    #panel .project-list button { padding: clamp(0.7rem, 0.6vw, 1rem) clamp(0.8rem, 0.7vw, 1.2rem); border-radius: clamp(14px, 1vw, 20px); }
+    #panel .p-tags { font-size: clamp(0.68rem, 0.6vw, 0.92rem); }
+    #panel .panel-note { font-size: clamp(0.72rem, 0.6vw, 0.95rem); margin-top: clamp(1.2rem, 1vw, 1.6rem); }
 }
 
 /* not enough room for every section in the top bar on small screens */
